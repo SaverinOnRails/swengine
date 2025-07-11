@@ -25,7 +25,6 @@ public partial class MainWindowViewModel : ViewModelBase {
         "Motionbgs.com",
         "Moewalls.com",
         "Desktophut.com",
-        "Mylivewallpapers.com",
         "Wallhaven.cc",
         "Wallhaven.cc(random)",
         "Wallpaperscraft.com",

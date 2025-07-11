@@ -1,25 +1,18 @@
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Avalonia.Data;
-
 using CommunityToolkit.Mvvm.ComponentModel;
-
 using FluentAvalonia.UI.Controls;
-
 using LibVLCSharp.Shared;
-
 using swengine.desktop.Helpers;
 using swengine.desktop.Models;
 using swengine.desktop.Services;
 
 namespace swengine.desktop.ViewModels;
 
-public partial class ApplyWindowViewModel : ViewModelBase
-{
+public partial class ApplyWindowViewModel : ViewModelBase {
     //get search results from previous window
     private WallpaperResponse _wallpaperResponse;
 
@@ -52,8 +45,7 @@ public partial class ApplyWindowViewModel : ViewModelBase
     //Initialize Native Libvlc client for playing the wallpaper preview
     private readonly LibVLC _libVlc = new LibVLC("--input-repeat=2");
 
-    public ApplyWindowViewModel()
-    {
+    public ApplyWindowViewModel() {
         MediaPlayer = new MediaPlayer(_libVlc);
     }
 
@@ -63,38 +55,30 @@ public partial class ApplyWindowViewModel : ViewModelBase
 
     //The wallpaper object that will be gotten from the Bg service after it has obtained information about the wallpaper.
     [ObservableProperty] private Wallpaper wallpaper;
-    public WallpaperResponse WallpaperResponse
-    {
+    public WallpaperResponse WallpaperResponse {
         get { return _wallpaperResponse; }
-        set
-        {
+        set {
             SetProperty(ref _wallpaperResponse, value);
             ObjectCreated();
         }
     }
 
     //Called when the WallpaperResponse object is set while the window is opening
-    public async void ObjectCreated()
-    {
-        try
-        {
+    public async void ObjectCreated() {
+        try {
             Wallpaper = await BgsProvider.InfoAsync(WallpaperResponse.Src, Title: WallpaperResponse.Title);
             using var media = new Media(_libVlc, new Uri(Wallpaper.Preview));
             MediaPlayer.Play(media);
             MediaPlayer.Volume = 0;
-        }
-        catch { }
+        } catch { }
     }
 
     //Apply wallpaper. Will be abstracted for Both Live and static wallpaper
-    public async void ApplyWallpaper()
-    {
+    public async void ApplyWallpaper() {
         //dialog cannot draw over video, so hide video when dialog is about to display
         IsVideoVisible = false;
-        if (Wallpaper == null)
-        {
-            ContentDialog warningDialog = new()
-            {
+        if (Wallpaper == null) {
+            ContentDialog warningDialog = new() {
                 Title = "Warning",
                 Content = "Wallpaper information is still loading. Please try again",
                 CloseButtonText = "Dismiss"
@@ -105,84 +89,59 @@ public partial class ApplyWindowViewModel : ViewModelBase
             IsVideoVisible = true;
             return;
         }
-        ContentDialog dialog = new()
-        {
+        ContentDialog dialog = new() {
             Title = "Apply this wallpaper",
             PrimaryButtonText = "Apply",
             IsPrimaryButtonEnabled = true,
             Content = ApplyDialogContent()
         };
-        dialog.Closed += (sender, args) =>
-        {
+        dialog.Closed += (sender, args) => {
             //show the video again when dialog is closing
             IsVideoVisible = true;
         };
         var dialogResponse = await dialog.ShowAsync();
 
-        if (dialogResponse == ContentDialogResult.Primary)
-        {
+        if (dialogResponse == ContentDialogResult.Primary) {
             dialog.Hide();
             await Task.Delay(1000);
             IsVideoVisible = false;
-            var applicationStatusDialog = new ContentDialog()
-            {
+            var applicationStatusDialog = new ContentDialog() {
                 Title = "Applying Wallpaper",
                 CloseButtonText = "Stop"
             };
-            applicationStatusDialog.Bind(ContentDialog.ContentProperty, new Binding()
-            {
+            applicationStatusDialog.Bind(ContentDialog.ContentProperty, new Binding() {
                 Path = "ApplicationStatusWrapper.Status",
                 Source = this,
                 Mode = BindingMode.TwoWay,
             });
-            applicationStatusDialog.Closed += (sender, args) =>
-            {
+            applicationStatusDialog.Closed += (sender, args) => {
                 IsVideoVisible = true;
             };
             CancellationTokenSource ctx = new();
-            applicationStatusDialog.Opened += (sender, args) =>
-            {
-                Task.Run(() =>
-                {
+            applicationStatusDialog.Opened += (sender, args) => {
+                Task.Run(() => {
                     WallpaperHelper.ApplyWallpaperAsync(
-                  wallpaper: Wallpaper,
-
-                   applicationStatusWrapper: ApplicationStatusWrapper,
-
-                   selectedResolution: SelectedResolution,
-
+                    wallpaper: Wallpaper,
+                    applicationStatusWrapper: ApplicationStatusWrapper,
+                    selectedResolution: SelectedResolution,
                     selectedFps: SelectedFps,
-
-                   selectedDuration: SelectedDuration,
-
+                    selectedDuration: SelectedDuration,
                     bestSettings: BestSettings,
                     backend: Backend,
                     token: ctx.Token,
-
                     referrer: WallpaperResponse.Src);
                 });
             };
-            applicationStatusDialog.Closed += (sender, args) =>
-            {
+            applicationStatusDialog.Closed += (sender, args) => {
                 ctx.Cancel();
             };
             await applicationStatusDialog.ShowAsync();
-
-
         }
-
     }
-
-    //Content for the content dialog that requests for FPS,resolution, e.t.c
-
 }
-
-public class DesignApplyWindowViewModel : ApplyWindowViewModel
-{
-    public DesignApplyWindowViewModel()
-    {
-        Wallpaper = new()
-        {
+public class DesignApplyWindowViewModel : ApplyWindowViewModel {
+    public DesignApplyWindowViewModel() {
+        Wallpaper = new() {
             Title = "Garp With Galaxy Impact",
             Preview = "https://www.motionbgs.com/media/6384/garp-with-galaxy-impact.960x540.mp4",
             WallpaperType = WallpaperType.Live,
@@ -193,8 +152,7 @@ public class DesignApplyWindowViewModel : ApplyWindowViewModel
 }
 
 //wrapper class for ApplicationStatus
-public partial class ApplicationStatusWrapper : ObservableObject
-{
+public partial class ApplicationStatusWrapper : ObservableObject {
     [ObservableProperty]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ApplicationStatusWrapper))]
     private string status;

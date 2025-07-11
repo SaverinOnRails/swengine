@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using swengine.desktop.Models;
 namespace swengine.desktop.Scrapers;
-public static class DesktopHutScraper
-{
+public static class DesktopHutScraper {
     private static readonly string _base = "https://www.desktophut.com/";
-    public async static Task<List<WallpaperResponse>> LatestOrSearchAsync(int Page = 1, string Function = "latest", string Query = "")
-    {
+    public async static Task<List<WallpaperResponse>> LatestOrSearchAsync(int Page = 1, string Function = "latest", string Query = "") {
         List<WallpaperResponse> responses = new();
         HttpClient client = HttpClientProvider.Client;
         string url = Function == "latest" ? $"{_base}?page={Page}" : $"{_base}search/{Query}?page={Page}";
@@ -34,14 +32,12 @@ public static class DesktopHutScraper
         string responseBody = await response.Content.ReadAsStringAsync();
         HtmlDocument htmlDoc = new();
         htmlDoc.LoadHtml(responseBody);
-        var items = htmlDoc.DocumentNode.SelectNodes(".//div[@class='masonry-item']");
-        foreach (var item in items)
-        {
+        var items = htmlDoc.DocumentNode.SelectNodes(".//a[contains(@class,'d-block')]");
+        foreach (var item in items) {
             var title = item.SelectSingleNode(".//h2").InnerHtml;
-            var src = _base + item.SelectSingleNode(".//a").GetAttributeValue("href", "").TrimStart('/');
-            var thumbnail = item.SelectSingleNode(".//img").GetAttributeValue("data-src", "");
-            responses.Add(new()
-            {
+            var src = _base + item.GetAttributeValue("href", "").TrimStart('/');
+            var thumbnail = item.SelectSingleNode(".//img").GetAttributeValue("src", "");
+            responses.Add(new() {
                 Title = title,
                 Src = src,
                 Thumbnail = thumbnail
@@ -50,17 +46,16 @@ public static class DesktopHutScraper
         return responses;
     }
 
-    public static async Task<Wallpaper> InfoAsync(string Query)
-    {
+    public static async Task<Wallpaper> InfoAsync(string Query) {
         var http = HttpClientProvider.Client;
         var request = await http.GetAsync(Query);
+        request.EnsureSuccessStatusCode();
         string response = await request.Content.ReadAsStringAsync();
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(response);
         var preview = htmlDoc.DocumentNode.SelectSingleNode("//source").GetAttributeValue("src", "");
-        var sourceFile = htmlDoc.DocumentNode.SelectSingleNode("//a[@id='downloadButton']").GetAttributeValue("href", "");
-        return new()
-        {
+        var sourceFile = htmlDoc.DocumentNode.SelectSingleNode("//a[@id='downloadLink']").GetAttributeValue("href", "");
+        return new() {
             Title = Query.Split("/").Last(),
             Preview = preview,
             SourceFile = sourceFile

@@ -14,7 +14,6 @@ public static class FfmpegHelper {
     public async static Task<string> ConvertAsync(string file, string backend, double startAt = 0, double endAt = 5, GifQuality quality = GifQuality.q1080p, int fps = 60, bool bestSettings = false) {
         try {
             string home = Environment.GetEnvironmentVariable("HOME");
-
             //if file is not a video, dont bother converting. Just return the image.
             if (Path.GetExtension(file).ToLower() != ".mp4" && Path.GetExtension(file).ToLower() != ".mkv") {
                 string copyTo = home + "/Pictures/wallpapers/" + file.Split("/").Last();
