@@ -1,8 +1,8 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using LibVLCSharp.Avalonia;
 using swengine.desktop.ViewModels;
 
 namespace swengine.desktop.Views;
@@ -12,15 +12,15 @@ public partial class ApplyWindow : Window
     public ApplyWindow()
     {
         InitializeComponent();
-        video.Loaded += ((sender, args) =>
-        {
-            var datacontext = DataContext as ApplyWindowViewModel;
-           video.MediaPlayer = datacontext.MediaPlayer;
-        });
-        Closed += (sender, args) =>
+        // video.Loaded += ((sender, args) =>
+        // {
+        //     var datacontext = DataContext as ApplyWindowViewModel;
+        //    video.MediaPlayer = datacontext.MediaPlayer;
+        // });
+        Closing += (sender, args) =>
         {
             //stop all players
-           ( DataContext as ApplyWindowViewModel).MediaPlayer.Stop();
+           ( DataContext as ApplyWindowViewModel).Player.MpvCommand(new[] {"stop"});
           
         };
     }

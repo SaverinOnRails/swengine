@@ -10,7 +10,7 @@ public static class DesktopHutScraper {
     private static readonly string _base = "https://www.desktophut.com/";
     public async static Task<List<WallpaperResponse>> LatestOrSearchAsync(int Page = 1, string Function = "latest", string Query = "") {
         List<WallpaperResponse> responses = new();
-        HttpClient client = HttpClientProvider.Client;
+        HttpClient client = Singleton.Client;
         string url = Function == "latest" ? $"{_base}?page={Page}" : $"{_base}search/{Query}?page={Page}";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8");
@@ -47,7 +47,7 @@ public static class DesktopHutScraper {
     }
 
     public static async Task<Wallpaper> InfoAsync(string Query) {
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         var request = await http.GetAsync(Query);
         request.EnsureSuccessStatusCode();
         string response = await request.Content.ReadAsStringAsync();

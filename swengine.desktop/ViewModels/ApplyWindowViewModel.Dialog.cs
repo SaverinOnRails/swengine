@@ -11,7 +11,6 @@ using Avalonia.Data;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentAvalonia.UI.Controls;
-using LibVLCSharp.Shared;
 using swengine.desktop.Helpers;
 using swengine.desktop.Models;
 using swengine.desktop.Services;

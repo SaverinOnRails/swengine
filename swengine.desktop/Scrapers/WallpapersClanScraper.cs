@@ -17,7 +17,7 @@ public static class WallpapersClanScraper
     {
         List<WallpaperResponse> responses = new();
 
-        HttpClient client = HttpClientProvider.Client;
+        HttpClient client = Singleton.Client;
 
         using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://wallpapers-clan.com/wp-admin/admin-ajax.php");
 
@@ -66,7 +66,7 @@ public static class WallpapersClanScraper
 
     public async static Task<Wallpaper> InfoAsync(string query)
     {
-        HttpClient client = HttpClientProvider.Client;
+        HttpClient client = Singleton.Client;
         using HttpRequestMessage request =
             new HttpRequestMessage(HttpMethod.Get, query);
         request.Headers.Add(

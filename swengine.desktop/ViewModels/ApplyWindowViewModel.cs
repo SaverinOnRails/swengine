@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Data;
+using AvaloniaMpv;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentAvalonia.UI.Controls;
-using LibVLCSharp.Shared;
 using swengine.desktop.Helpers;
 using swengine.desktop.Models;
 using swengine.desktop.Services;
@@ -20,7 +20,7 @@ public partial class ApplyWindowViewModel : ViewModelBase {
     public IBgsProvider BgsProvider { get; set; }
 
     public string Backend { get; set; }
-
+    public MpvPlayer Player => Singleton.Player;
     //Resolution user selected. Defaults to 4k.
     [ObservableProperty]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ApplyWindowViewModel))]
@@ -36,22 +36,12 @@ public partial class ApplyWindowViewModel : ViewModelBase {
     [ObservableProperty]
     private bool bestSettings = true;
 
-    //Binding that determines if the video in the window is visible. Drawing over NativeControlHost is not very easy in avalonia so we must hide the video whenever we want to display a ContentDialog
-    [ObservableProperty] private bool isVideoVisible = true;
-
-    //ApplicationStatus as in Status of applying the wallpaper. It is wrapped in a mutable class so it can be passed as a reference to the WallpaperHelper
     [ObservableProperty] private ApplicationStatusWrapper applicationStatusWrapper = new();
 
     //Initialize Native Libvlc client for playing the wallpaper preview
-    private readonly LibVLC _libVlc = new LibVLC("--input-repeat=2");
 
     public ApplyWindowViewModel() {
-        MediaPlayer = new MediaPlayer(_libVlc);
     }
-
-    //Media Player object for libvlc
-    public MediaPlayer MediaPlayer { get; }
-
 
     //The wallpaper object that will be gotten from the Bg service after it has obtained information about the wallpaper.
     [ObservableProperty] private Wallpaper wallpaper;
@@ -59,6 +49,11 @@ public partial class ApplyWindowViewModel : ViewModelBase {
         get { return _wallpaperResponse; }
         set {
             SetProperty(ref _wallpaperResponse, value);
+            Player.MpvCommand(new string[] { "set", "hwdec", "no" });
+            Player.MpvCommand(new string[] { "set", "demuxer-max-bytes", "10M" });
+            Player.MpvCommand(new string[] { "set", "vd-lavc-threads", "1" });
+            Player.MpvCommand(new string[] { "set", "mute", "yes" });
+            Player.MpvCommand(new string[] { "set", "loop-file", "inf" });
             ObjectCreated();
         }
     }
@@ -67,26 +62,22 @@ public partial class ApplyWindowViewModel : ViewModelBase {
     public async void ObjectCreated() {
         try {
             Wallpaper = await BgsProvider.InfoAsync(WallpaperResponse.Src, Title: WallpaperResponse.Title);
-            using var media = new Media(_libVlc, new Uri(Wallpaper.Preview));
-            MediaPlayer.Play(media);
-            MediaPlayer.Volume = 0;
+            // using var media = new Media(_libVlc, new Uri(Wallpaper.Preview));
+            // MediaPlayer.Play(media);
+            // MediaPlayer.Volume = 0;
+            Player.StartPlayback(Wallpaper.Preview);
         } catch { }
     }
-
     //Apply wallpaper. Will be abstracted for Both Live and static wallpaper
     public async void ApplyWallpaper() {
         //dialog cannot draw over video, so hide video when dialog is about to display
-        IsVideoVisible = false;
         if (Wallpaper == null) {
             ContentDialog warningDialog = new() {
                 Title = "Warning",
                 Content = "Wallpaper information is still loading. Please try again",
                 CloseButtonText = "Dismiss"
             };
-            await Task.Delay(1000);
-            IsVideoVisible = false;
             await warningDialog.ShowAsync();
-            IsVideoVisible = true;
             return;
         }
         ContentDialog dialog = new() {
@@ -95,16 +86,10 @@ public partial class ApplyWindowViewModel : ViewModelBase {
             IsPrimaryButtonEnabled = true,
             Content = ApplyDialogContent()
         };
-        dialog.Closed += (sender, args) => {
-            //show the video again when dialog is closing
-            IsVideoVisible = true;
-        };
         var dialogResponse = await dialog.ShowAsync();
 
         if (dialogResponse == ContentDialogResult.Primary) {
             dialog.Hide();
-            await Task.Delay(1000);
-            IsVideoVisible = false;
             var applicationStatusDialog = new ContentDialog() {
                 Title = "Applying Wallpaper",
                 CloseButtonText = "Stop"
@@ -114,9 +99,6 @@ public partial class ApplyWindowViewModel : ViewModelBase {
                 Source = this,
                 Mode = BindingMode.TwoWay,
             });
-            applicationStatusDialog.Closed += (sender, args) => {
-                IsVideoVisible = true;
-            };
             CancellationTokenSource ctx = new();
             applicationStatusDialog.Opened += (sender, args) => {
                 Task.Run(() => {

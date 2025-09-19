@@ -19,7 +19,7 @@ public class WallpapersCraftScraper
     {
 
         string url = function == "latest" ? WallpapersCraftBase + $"/all/page{page}" : WallpapersCraftBase + $"/search/?order=&page={page}&query={query}&size=";
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         using var request = await http.GetAsync(url);
         request.EnsureSuccessStatusCode();
         HtmlDocument htmlDoc = new HtmlDocument();
@@ -42,7 +42,7 @@ public class WallpapersCraftScraper
     }
     public async static Task<Wallpaper> InfoAsync(string query)
     {
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         using var request = await http.GetAsync(query);
         request.EnsureSuccessStatusCode();
         HtmlDocument htmlDoc = new HtmlDocument();

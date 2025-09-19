@@ -15,7 +15,7 @@ public static class MoewallsScraper {
             url = MoewallsBase + $"/page/{Page}/?s={Query}";
         }
         List<WallpaperResponse> wallpaper_responses = new();
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         // string url = MoewallsBase + $"/page/{Page}";
         var request = await http.GetAsync(url);
         if (request.IsSuccessStatusCode) {
@@ -42,7 +42,7 @@ public static class MoewallsScraper {
         return default;
     }
     public async static Task<Wallpaper> InfoAsync(string Query, string Title) {
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         var request = await http.GetAsync(Query);
         if (request.IsSuccessStatusCode) {
             string response = await request.Content.ReadAsStringAsync();

@@ -21,7 +21,7 @@ public static class MyLiveWallpapersScraper
     {
         string url = function == "latest" ? mlwbase + $"page/{page}"
                                           : mlwbase + $"page/{page}/?s={query}";
-        HttpClient client = HttpClientProvider.Client;
+        HttpClient client = Singleton.Client;
         using HttpRequestMessage request =
             new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Add(
@@ -57,7 +57,7 @@ public static class MyLiveWallpapersScraper
 
     public static async Task<Wallpaper> InfoAsync(string query)
     {
-        HttpClient client = HttpClientProvider.Client;
+        HttpClient client = Singleton.Client;
         using HttpRequestMessage request =
             new HttpRequestMessage(HttpMethod.Get, query);
         request.Headers.Add(

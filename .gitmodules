@@ -1,0 +1,3 @@
+[submodule "AvaloniaMpv"]
+	path = AvaloniaMpv
+	url = https://github.com/SaverinOnRails/AvaloniaMpv

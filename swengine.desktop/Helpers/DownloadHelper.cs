@@ -24,7 +24,7 @@ public static class DownloadHelper
                 return CopyLocalFile(Link);
             }
 
-            var client = HttpClientProvider.Client;
+            var client = Singleton.Client;
             using var request = new HttpRequestMessage(HttpMethod.Get, Link);
             Debug.WriteLine(Link);
             request.Headers.Add(

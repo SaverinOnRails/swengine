@@ -6,7 +6,7 @@
         x:Class="swengine.desktop.Views.ApplyWindow"
         xmlns:vm="using:swengine.desktop.ViewModels"
         x:DataType="vm:ApplyWindowViewModel"
-        xmlns:vlc="using:LibVLCSharp.Avalonia"
+        xmlns:mpv="using:AvaloniaMpv"
         WindowStartupLocation="CenterScreen"
         Height="500"
         Width="700"
@@ -15,10 +15,10 @@
         <vm:DesignApplyWindowViewModel/>
     </Design.DataContext>
     <Grid RowDefinitions="Auto,1">
-        <vlc:VideoView Grid.Row="0"  Height="450"  x:Name="video" Margin="0,0,0,0" IsVisible="{Binding  IsVideoVisible}">
-            
-            <!-- <TextBlock Text="{Binding Wallpaper.Resolution}" HorizontalAlignment="Right"></TextBlock> -->
-        </vlc:VideoView>
+        <!-- <vlc:VideoView Grid.Row="0"  Height="450"  x:Name="video" Margin="0,0,0,0" IsVisible="{Binding  IsVideoVisible}"> -->
+        <!-- <TextBlock Text="{Binding Wallpaper.Resolution}" HorizontalAlignment="Right"></TextBlock> -->
+        <!-- </vlc:VideoView> -->
+        <mpv:MediaControl Height="450" MpvPlayer="{Binding Player}"/>
         <StackPanel Grid.Row="1">
             <Button HorizontalAlignment="Center" Command="{Binding ApplyWallpaper}">Apply This Wallpaper</Button>
         </StackPanel>

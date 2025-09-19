@@ -17,7 +17,7 @@ public static class MotionBgsScraper
     public static async Task<List<WallpaperResponse>> LatestAsync(int Page)
     {
         string url = $"{MotionBgsBase}/hx2/latest/{Page}/";
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         var request = await http.GetAsync(url);
         if (request.IsSuccessStatusCode)
         {
@@ -45,7 +45,7 @@ public static class MotionBgsScraper
 
     public static async Task<Wallpaper> InfoAsync(string Query, string Title)
     {
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         var request = await http.GetAsync(Query);
         if (request.IsSuccessStatusCode)
         {
@@ -79,7 +79,7 @@ public static class MotionBgsScraper
         string url = $"{MotionBgsBase}/search?q={Query}&page={Page}";
         Debug.WriteLine(url);
         List<WallpaperResponse> result = new();
-        var http = HttpClientProvider.Client;
+        var http = Singleton.Client;
         var request = await http.GetAsync(url);
         if (request.IsSuccessStatusCode)
         {
