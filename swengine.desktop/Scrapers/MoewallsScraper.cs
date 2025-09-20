@@ -50,7 +50,7 @@ public static class MoewallsScraper {
             htmlDoc.LoadHtml(response);
             string source_tag = htmlDoc.DocumentNode.SelectSingleNode("//source[@type='video/mp4']")
                 .GetAttributeValue("src", null);
-            string download = "https://moewalls.com/download.php?video=" + htmlDoc.DocumentNode.SelectSingleNode("//button[@id='moe-download']")
+            string download = "https://go.moewalls.com/download.php?video=" + htmlDoc.DocumentNode.SelectSingleNode("//button[@id='moe-download']")
                 .GetAttributeValue("data-url", null);
             string text_xs = "4k";
             return new Wallpaper() {

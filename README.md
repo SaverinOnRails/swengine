@@ -28,7 +28,7 @@ Swengine is written in c#. You will require the dotnet SDK to build it.
 
 Runtime dependencies include: 
 ```
-vlc and/or libvlc-dev           -> (depends on your distro and package manager. Install both if both are available)
+MPV                              -> (depends on your distro and package manager. Install both if both are available)
 ffmpeg                          -> For conversions
 swwww                            -> Wallpaper daemon for wayland that supports gif wallpapers 
   ```
@@ -66,7 +66,7 @@ After installing dotnet, you may install from source.
 
 ```
 #clone project
-git clone https://www.github.com/eugenenoble2005/swengine.git
+git clone https://www.github.com/saverinonrails/swengine.git --recursive
 
 #cd into project
 cd swengine/swengine.desktop
@@ -92,6 +92,10 @@ exec-once= swww-daemon --format xrgb &
 
 #display last used wallpaper from cache
 exec=swww restore
+
+# Yin exmpla
+exec-once=yin
+exec-once=yin --restore
 ```
 
 <h3>Example Sway Configuration</h3>

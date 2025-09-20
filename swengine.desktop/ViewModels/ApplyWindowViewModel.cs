@@ -65,12 +65,11 @@ public partial class ApplyWindowViewModel : ViewModelBase {
             // using var media = new Media(_libVlc, new Uri(Wallpaper.Preview));
             // MediaPlayer.Play(media);
             // MediaPlayer.Volume = 0;
+            Player.MpvCommand(new string[] { "set", "pause", "no" });
             Player.StartPlayback(Wallpaper.Preview);
         } catch { }
     }
-    //Apply wallpaper. Will be abstracted for Both Live and static wallpaper
     public async void ApplyWallpaper() {
-        //dialog cannot draw over video, so hide video when dialog is about to display
         if (Wallpaper == null) {
             ContentDialog warningDialog = new() {
                 Title = "Warning",
@@ -87,7 +86,7 @@ public partial class ApplyWindowViewModel : ViewModelBase {
             Content = ApplyDialogContent()
         };
         var dialogResponse = await dialog.ShowAsync();
-
+        Player.MpvCommand(new string[] { "set", "pause", "yes" });
         if (dialogResponse == ContentDialogResult.Primary) {
             dialog.Hide();
             var applicationStatusDialog = new ContentDialog() {
