@@ -49,11 +49,6 @@ public partial class ApplyWindowViewModel : ViewModelBase {
         get { return _wallpaperResponse; }
         set {
             SetProperty(ref _wallpaperResponse, value);
-            Player.MpvCommand(new string[] { "set", "hwdec", "no" });
-            Player.MpvCommand(new string[] { "set", "demuxer-max-bytes", "10M" });
-            Player.MpvCommand(new string[] { "set", "vd-lavc-threads", "1" });
-            Player.MpvCommand(new string[] { "set", "mute", "yes" });
-            Player.MpvCommand(new string[] { "set", "loop-file", "inf" });
             ObjectCreated();
         }
     }
@@ -65,7 +60,11 @@ public partial class ApplyWindowViewModel : ViewModelBase {
             // using var media = new Media(_libVlc, new Uri(Wallpaper.Preview));
             // MediaPlayer.Play(media);
             // MediaPlayer.Volume = 0;
-            Player.MpvCommand(new string[] { "set", "pause", "no" });
+            try {
+                Player.MpvCommand(new string[] { "set", "mute", "yes" });
+                Player.MpvCommand(new string[] { "set", "loop-file", "inf" });
+                Player.MpvCommand(new string[] { "set", "pause", "no" });
+            } catch { }
             Player.StartPlayback(Wallpaper.Preview);
         } catch { }
     }
