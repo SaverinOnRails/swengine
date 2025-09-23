@@ -62,7 +62,7 @@ public static class WallHavenScraper
             var response = await request.Content.ReadAsStringAsync();
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(response);
-            string source = htmlDoc.DocumentNode.SelectSingleNode("//img[@id='wallpaper']").GetAttributeValue("data-cfsrc", null);
+            string source = htmlDoc.DocumentNode.SelectSingleNode("//img[@id='wallpaper']").GetAttributeValue("src", null);
             string Title = htmlDoc.DocumentNode.SelectSingleNode("//title").InnerHtml;
 
             return new Wallpaper()
